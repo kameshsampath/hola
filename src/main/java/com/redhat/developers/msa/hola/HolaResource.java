@@ -17,6 +17,7 @@
 package com.redhat.developers.msa.hola;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,8 @@ import io.swagger.annotations.ApiOperation;
 @Path("/")
 public class HolaResource {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HolaResource.class);
+
     @Inject
     private AlohaService alohaService;
 
@@ -53,6 +56,15 @@ public class HolaResource {
     @ApiOperation("Returns the greeting in Spanish")
     public String hola() {
         String hostname = System.getenv().getOrDefault("HOSTNAME", "unknown");
+        Enumeration<String> headerNames = servletRequest.getHeaderNames();
+        while (headerNames.hasMoreElements()){
+            String headerName = headerNames.nextElement();
+            String headerValue = servletRequest.getHeader(headerName);
+            if(headerValue != null){
+                log.info("Header {} has value {}",headerName,headerValue);
+            }
+        }
+
         String translation = ConfigResolver
             .resolve("hello")
             .withDefault("Hola de %s")

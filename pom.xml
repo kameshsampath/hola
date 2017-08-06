@@ -21,7 +21,7 @@
 
 	<groupId>com.redhat.developers.msa</groupId>
 	<artifactId>hola</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>war</packaging>
 	<name>Red Hat MSA: hola</name>
 	<description>Hello microservice using WildFly Swarm</description>
@@ -63,6 +63,11 @@
 		<hystrix.version>1.5.1</hystrix.version>
 		<jaeger.version>0.19.0</jaeger.version>
 		<swagger.version>1.5.8</swagger.version>
+
+		<fabric8-maven-plugin.version>3.5.22</fabric8-maven-plugin.version>
+
+		<!-- The docker image name -->
+		<fabric8.generator.name>${project.artifactId}:${project.version}</fabric8.generator.name>
 	</properties>
 
 
@@ -213,6 +218,44 @@
 					</execution>
 				</executions>
 			</plugin>
+
+      <!-- fabric8 maven plugin -->
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>fabric8-maven-plugin</artifactId>
+        <version>${fabric8-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>istioctl</executable>
+          <workingDirectory>${basedir}/src/istio</workingDirectory>
+          <arguments>
+            <argument>kube-inject</argument>
+            <argument>-f</argument>
+            <argument>hola.yaml</argument>
+            <argument>-o</argument>
+            <argument>istio-hola.yaml</argument>
+          </arguments>
+        </configuration>
+      </plugin>
 		</plugins>
 	</build>
 
